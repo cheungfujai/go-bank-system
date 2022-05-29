@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"simplebank/db/util"
+	"sync"
 	"testing"
 	"time"
 
@@ -33,6 +34,12 @@ func createRandomAccount(t *testing.T) Account {
 	require.NotZero(t, testAccount.CreatedAt)
 
 	return testAccount
+}
+
+func CreateAccountConcurrency(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		createRandomAccount(t)
+	}
 }
 
 func TestGetAccount(t *testing.T) {
@@ -85,10 +92,14 @@ func TestDeleteAccount(t *testing.T) {
 }
 
 func TestListAccounts(t *testing.T) {
-	// TODO - EN2360: Make the current createRandomAccount to Run in Parallel
-	for i := 0; i < 10; i++ {
-		createRandomAccount(t)
-	}
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		CreateAccountConcurrency(t)
+		wg.Done()
+	}()
+
+	wg.Wait()
 
 	arg := ListAccountsParams{
 		Limit:  5,
