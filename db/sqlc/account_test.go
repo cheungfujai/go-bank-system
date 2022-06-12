@@ -36,12 +36,6 @@ func createRandomAccount(t *testing.T) Account {
 	return testAccount
 }
 
-func CreateAccountConcurrency(t *testing.T) {
-	for i := 0; i < 10; i++ {
-		createRandomAccount(t)
-	}
-}
-
 func TestGetAccount(t *testing.T) {
 	account1 := createRandomAccount(t)
 	account2, err := testQueries.GetAccount(context.Background(), account1.ID)
@@ -95,7 +89,7 @@ func TestListAccounts(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
-		CreateAccountConcurrency(t)
+		createRandomAccount(t)
 		wg.Done()
 	}()
 
