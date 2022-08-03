@@ -4,11 +4,15 @@ import (
 	"database/sql"
 	"log"
 	"simplebank/api"
+	bankcache "simplebank/cache"
 	db "simplebank/db/sqlc"
 	"simplebank/db/util"
 
 	_ "github.com/lib/pq"
+	"github.com/patrickmn/go-cache"
 )
+
+var c *cache.Cache
 
 func main() {
 	// example cronjob which print hello world for every second. Uncomment the line to taste it.
@@ -28,7 +32,8 @@ func main() {
 	}
 
 	store := db.NewStore(connection)
-	server, err := api.NewServer(config, store)
+	cache := bankcache.NewCache()
+	server, err := api.NewServer(config, store, cache)
 	if err != nil {
 		log.Fatal("Cannot create server: ", err)
 	}

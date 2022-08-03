@@ -1,13 +1,15 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/require"
 	"os"
+	bankcache "simplebank/cache"
 	db "simplebank/db/sqlc"
 	"simplebank/db/util"
 	"testing"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/require"
 )
 
 func newTestServer(t *testing.T, store db.Store) *Server {
@@ -16,7 +18,8 @@ func newTestServer(t *testing.T, store db.Store) *Server {
 		AccessTokenDuration: time.Minute,
 	}
 
-	server, err := NewServer(config, store)
+	cache := bankcache.NewCache()
+	server, err := NewServer(config, store, cache)
 	require.NoError(t, err)
 
 	return server

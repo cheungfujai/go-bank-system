@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	bankcache "simplebank/cache"
 	db "simplebank/db/sqlc"
 	"simplebank/db/util"
 	"simplebank/token"
@@ -16,9 +17,10 @@ type Server struct {
 	router     *gin.Engine
 	tokenMaker token.Maker
 	config     util.Config
+	cache      bankcache.BankCache
 }
 
-func NewServer(config util.Config, store db.Store) (*Server, error) {
+func NewServer(config util.Config, store db.Store, cache bankcache.BankCache) (*Server, error) {
 
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
 	if err != nil {
@@ -29,6 +31,7 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 		store:      store,
 		tokenMaker: tokenMaker,
 		config:     config,
+		cache:      cache,
 	}
 
 	if valid, ok := binding.Validator.Engine().(*validator.Validate); ok {
