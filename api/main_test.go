@@ -6,20 +6,17 @@ import (
 	db "simplebank/db/sqlc"
 	"simplebank/db/util"
 	"testing"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 )
 
 func newTestServer(t *testing.T, store db.Store) *Server {
-	config := util.Config{
-		TokenSymmetricKey:   util.RandomString(32),
-		AccessTokenDuration: time.Minute,
-	}
-
+	config, err := util.LoadViberConfig("../")
+	require.NoError(t, err)
 	cache := bankcache.NewCache()
-	server, err := NewServer(config, store, cache)
+	exchangeService := &SpyExchangeService{}
+	server, err := NewServer(config, store, cache, exchangeService)
 	require.NoError(t, err)
 
 	return server

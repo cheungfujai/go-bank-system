@@ -3,6 +3,7 @@ package util
 import (
 	"database/sql"
 	"fmt"
+	"math"
 	"math/rand"
 	"strings"
 	"time"
@@ -58,4 +59,20 @@ func RandomContactNumber() sql.NullString {
 
 func RandomAddress() sql.NullString {
 	return sql.NullString{String: RandomString(0)}
+}
+
+func RandomExchangeRate() float64 {
+	return rand.Float64() * float64(RandomInt(1, 13))
+}
+
+func RandomFloat64() float64 {
+	return rand.Float64() * float64(RandomInt(1, 1000))
+}
+
+func RoundFloatAtDecimal(num float64, decimal int) (float64, error) {
+	if num <= 0 && num > 10 {
+		return 0.0, fmt.Errorf("rounding support 1 to 10 decimal only")
+	}
+	decimalLevel := math.Pow(10, float64(decimal))
+	return math.Round(num*decimalLevel) / decimalLevel, nil
 }

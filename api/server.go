@@ -5,6 +5,7 @@ import (
 	bankcache "simplebank/cache"
 	db "simplebank/db/sqlc"
 	"simplebank/db/util"
+	exchangeService "simplebank/service"
 	"simplebank/token"
 
 	"github.com/gin-gonic/gin"
@@ -13,14 +14,15 @@ import (
 )
 
 type Server struct {
-	store      db.Store
-	router     *gin.Engine
-	tokenMaker token.Maker
-	config     util.Config
-	cache      bankcache.BankCache
+	store           db.Store
+	router          *gin.Engine
+	tokenMaker      token.Maker
+	config          util.Config
+	cache           bankcache.BankCache
+	exchangeService exchangeService.ExchangeServiceInterface
 }
 
-func NewServer(config util.Config, store db.Store, cache bankcache.BankCache) (*Server, error) {
+func NewServer(config util.Config, store db.Store, cache bankcache.BankCache, exchangeService exchangeService.ExchangeServiceInterface) (*Server, error) {
 
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
 	if err != nil {
@@ -28,10 +30,11 @@ func NewServer(config util.Config, store db.Store, cache bankcache.BankCache) (*
 	}
 
 	server := &Server{
-		store:      store,
-		tokenMaker: tokenMaker,
-		config:     config,
-		cache:      cache,
+		store:           store,
+		tokenMaker:      tokenMaker,
+		config:          config,
+		cache:           cache,
+		exchangeService: exchangeService,
 	}
 
 	if valid, ok := binding.Validator.Engine().(*validator.Validate); ok {

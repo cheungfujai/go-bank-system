@@ -7,6 +7,7 @@ import (
 	bankcache "simplebank/cache"
 	db "simplebank/db/sqlc"
 	"simplebank/db/util"
+	exchangeService "simplebank/service"
 
 	_ "github.com/lib/pq"
 	"github.com/patrickmn/go-cache"
@@ -33,7 +34,8 @@ func main() {
 
 	store := db.NewStore(connection)
 	cache := bankcache.NewCache()
-	server, err := api.NewServer(config, store, cache)
+	exchangeService := exchangeService.NewExchangeService(config)
+	server, err := api.NewServer(config, store, cache, exchangeService)
 	if err != nil {
 		log.Fatal("Cannot create server: ", err)
 	}
